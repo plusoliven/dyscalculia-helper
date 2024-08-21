@@ -20,5 +20,10 @@ namespace dyscalculia_helper
         {
             InitializeComponent();
         }
+
+        private void Window_MouseLeave(object sender, MouseEventArgs e)
+        {
+            this.Hide();
+        }
     }
 }
