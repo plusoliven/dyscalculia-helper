@@ -11,6 +11,6 @@
         MouseLeave="Window_MouseLeave"
         >
     <Grid>
-
+        <TextBlock x:Name="NumberDisplay" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
     </Grid>
 </Window>

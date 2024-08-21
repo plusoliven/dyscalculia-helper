@@ -48,7 +48,7 @@ namespace dyscalculia_helper
 
                 _window.Show();
                 _window.Activate();
-                return;
+                _window.UpdateNumberDisplay(numberSelected);
             }
     
         }

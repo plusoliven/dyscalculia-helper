@@ -25,5 +25,10 @@ namespace dyscalculia_helper
         {
             this.Hide();
         }
+
+        public void UpdateNumberDisplay(float? numberSelected)
+        {
+            NumberDisplay.Text = numberSelected?.ToString();
+        }
     }
 }
