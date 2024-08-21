@@ -5,12 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:dyscalculia_helper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="200" Width="400"
         WindowStyle="None" 
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
         MouseLeave="Window_MouseLeave"
+        SizeToContent="Width"
+        ShowInTaskbar="False"
         >
-    <Grid>
-        <TextBlock x:Name="NumberDisplay" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+    <Grid Background="#FF50565B">
+        <TextBlock x:Name="NumberDisplay" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" Text="1000005" Margin="0,129,0,0" Padding="10" Foreground="White"/>
+        <TextBlock x:Name="ThousandsSeparatedDisplay" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" Text="10,000,05" Margin="0,94,0,0" Padding="10" Foreground="White"/>
+        <TextBlock x:Name="NumberWordsDisplay" HorizontalAlignment="Center" VerticalAlignment="Top" FontSize="24" Text="1 million and 5" Padding="10" Margin="0,59,0,0" Foreground="White"/>
     </Grid>
 </Window>

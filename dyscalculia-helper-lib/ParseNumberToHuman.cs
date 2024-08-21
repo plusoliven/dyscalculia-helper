@@ -17,7 +17,7 @@ namespace dyscalculia_helper_lib
             public string PhoneNumber;
         }
 
-        public NUMBERFORMATS ConvertNumberToFormats (float number)
+        public static NUMBERFORMATS ConvertNumberToFormats (float number)
         {
             string[] numberIntDecimals = number.ToString().Split('.'); // TODO -- add setting for decimal separator
 
@@ -34,7 +34,7 @@ namespace dyscalculia_helper_lib
                 Number = number.ToString(),
                 ThousandsSeparated = number.ToString("N0"),
                 Words = numberToWords,
-                PhoneNumber = number.ToString("00-00-00-00-")
+                PhoneNumber = number.ToString("00 00 00 00")
             };
         }
     }

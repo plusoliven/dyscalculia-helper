@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using dyscalculia_helper_lib;
 
 namespace dyscalculia_helper
 {
@@ -26,9 +27,12 @@ namespace dyscalculia_helper
             this.Hide();
         }
 
-        public void UpdateNumberDisplay(float? numberSelected)
+        public void UpdateNumbersDisplay(ParseNumberToHuman.NUMBERFORMATS formats)
         {
-            NumberDisplay.Text = numberSelected?.ToString();
+            NumberDisplay.Text = formats.Number;
+            ThousandsSeparatedDisplay.Text = formats.ThousandsSeparated;
+            NumberWordsDisplay.Text = formats.Words;
+            // PhoneNumberDisplay.Text = formats.PhoneNumber;
         }
     }
 }

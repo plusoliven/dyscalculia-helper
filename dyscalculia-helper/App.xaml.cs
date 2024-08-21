@@ -41,14 +41,18 @@ namespace dyscalculia_helper
 
             if (numberSelected != null) 
             {
-                Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
+                _window.Show();
+                var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected.Value);
 
+                _window.UpdateNumbersDisplay(numberFormats);
+
+                Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
                 _window.Left = mousePosition.X - (_window.Width / 2);
                 _window.Top = mousePosition.Y - (_window.Height - 20);
 
-                _window.Show();
                 _window.Activate();
-                _window.UpdateNumberDisplay(numberSelected);
+
+               
             }
     
         }
