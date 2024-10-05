@@ -5,6 +5,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -18,6 +19,12 @@ namespace dyscalculia_helper
     public partial class MainWindow : Window
     {
         private TaskCompletionSource<char> decimalSeparatorTcs;
+        private DoubleAnimation fadeInAnimation = new DoubleAnimation
+        {
+            From = 0.0,
+            To = 1.0,
+            Duration = new Duration(TimeSpan.FromSeconds(0.1))
+        };
 
         public MainWindow()
         {
@@ -42,6 +49,26 @@ namespace dyscalculia_helper
             SelectDecimalGrid.Visibility = Visibility.Collapsed;
 
             return result;
+        }
+
+        public void ShowWindow()
+        {
+            Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
+            this.Left = mousePosition.X - (this.Width / 2);
+            this.Top = mousePosition.Y - (this.Height - 20);
+            FadeInWindow();
+            this.Activate();
+            this.Show();
+        }
+
+        private void FadeInWindow()
+        {
+            var storyboard = new Storyboard();
+            storyboard.Children.Add(fadeInAnimation);
+            Storyboard.SetTarget(fadeInAnimation, this);
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(OpacityProperty));
+
+            this.BeginStoryboard(storyboard);
         }
 
         private void CommaButton_Click(object sender, RoutedEventArgs e)

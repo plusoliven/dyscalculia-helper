@@ -22,7 +22,6 @@ namespace dyscalculia_helper
         {
             base.OnStartup(e);
 
-            // Set up hotkey(s)
             if (_settings.Hotkeys.Count > 0)
             {
                 foreach (var hotkey in _settings.Hotkeys)
@@ -30,15 +29,6 @@ namespace dyscalculia_helper
                     HotkeyManager.Current.AddOrReplace("ShowWindow", hotkey.Key, hotkey.ModifierKey, OnHotkeyPressed);
                 }
             }
-        }
-
-        private void ShowWindowAndSetPositionToMouse()
-        {
-            _window.Show();
-            Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
-            _window.Left = mousePosition.X - (_window.Width / 2);
-            _window.Top = mousePosition.Y - (_window.Height - 20);
-            _window.Activate();
         }
 
         private async void OnHotkeyPressed(object sender, HotkeyEventArgs e)
@@ -51,7 +41,7 @@ namespace dyscalculia_helper
                 // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
                 if (selectedText.Contains('.') || selectedText.Contains(','))
                 {
-                    ShowWindowAndSetPositionToMouse();
+                    _window.ShowWindow();
                     char decimalSeparator = await _window.DetermineDecimalSeparator(selectedText);
 
                     if (decimalSeparator == ',')
@@ -74,10 +64,9 @@ namespace dyscalculia_helper
             if (numberSelected != decimal.MinValue)
             {
                 var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected, _settings.DecimalSeparator);
-                Console.WriteLine(numberFormats);
                 _window.UpdateNumbersDisplay(numberFormats);
 
-                ShowWindowAndSetPositionToMouse();
+                _window.ShowWindow();
             }
         }
 
