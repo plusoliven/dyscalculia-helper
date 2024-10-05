@@ -3,6 +3,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
+using System.Text.RegularExpressions;
 using NHotkey;
 using NHotkey.Wpf;
 using dyscalculia_helper_lib;
@@ -38,6 +39,16 @@ namespace dyscalculia_helper
 
             if (selectedText != null) 
             {
+                // Check if the selected text contains non-numeric characters, but still a full number
+                var regexMatch = new Regex(@"\d[0-9,\.]*\d").Match(selectedText);
+                if (regexMatch.Success) {
+                    selectedText = regexMatch.Value;
+                }
+                else
+                {
+                    return;
+                }
+
                 // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
                 if (selectedText.Contains('.') || selectedText.Contains(','))
                 {
