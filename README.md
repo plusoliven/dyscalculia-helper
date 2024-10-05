@@ -25,6 +25,7 @@ To use, simply select any text containing a number and press the hotkey (default
  - [ ] Remember the last chosen decimal separator
  - [ ] Phone number formatting support
  - [ ] Hold hotkey modifier to allow copying text from window
+ - [ ] Try to automatically determine decimal separator
  
 ### Todo / bugs
  - [ ] Window does not always appear at the mouse position
