@@ -17,6 +17,8 @@ namespace dyscalculia_helper
     /// </summary>
     public partial class MainWindow : Window
     {
+        private TaskCompletionSource<char> decimalSeparatorTcs;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -27,8 +29,36 @@ namespace dyscalculia_helper
             this.Hide();
         }
 
+        public async Task<char> DetermineDecimalSeparator(string selectedText)
+        {
+            ShowNumbersGrid.Visibility = Visibility.Collapsed;
+            SelectDecimalGrid.Visibility = Visibility.Visible;
+
+            SelectDecimalCharSelectedText.Text = selectedText;
+
+            decimalSeparatorTcs = new TaskCompletionSource<char>();
+            char result = await decimalSeparatorTcs.Task;
+
+            SelectDecimalGrid.Visibility = Visibility.Collapsed;
+
+            return result;
+        }
+
+        private void CommaButton_Click(object sender, RoutedEventArgs e)
+        {
+            decimalSeparatorTcs?.SetResult(',');
+        }
+
+        private void PeriodButton_Click(object sender, RoutedEventArgs e)
+        {
+            decimalSeparatorTcs?.SetResult('.');
+        }
+
         public void UpdateNumbersDisplay(ParseNumberToHuman.NUMBERFORMATS formats)
         {
+            SelectDecimalGrid.Visibility = Visibility.Collapsed;
+            ShowNumbersGrid.Visibility = Visibility.Visible;
+
             NumberDisplay.Text = formats.Number;
             ThousandsSeparatedDisplay.Text = formats.ThousandsSeparated;
             NumberWordsDisplay.Text = formats.Words;

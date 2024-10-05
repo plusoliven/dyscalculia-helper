@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Humanizer;
+using System.Globalization;
 
 namespace dyscalculia_helper_lib
 {
@@ -17,15 +18,20 @@ namespace dyscalculia_helper_lib
             public string PhoneNumber;
         }
 
-        public static NUMBERFORMATS ConvertNumberToFormats (float number)
+        public static NUMBERFORMATS ConvertNumberToFormats (decimal number, char decimalSeparator)
         {
-            string[] numberIntDecimals = number.ToString().Split('.'); // TODO -- add setting for decimal separator
+            var numberString = number.ToString();
+            var numberToWords = "";
 
-            string numberToWords = int.Parse(numberIntDecimals[0]).ToWords();
-            
-            if (numberIntDecimals.Length > 1)
+            // Split the number into its integer and decimal parts, and ToWords() both separately as humanizer doesn't support decimal numbers
+            if (numberString.Contains(decimalSeparator))
             {
-                numberToWords += " point " + int.Parse(numberIntDecimals[1]).ToWords();
+                var numberParts = numberString.Split(decimalSeparator);
+                numberToWords = Convert.ToInt64(numberParts[0]).ToWords() + " point " + Convert.ToInt64(numberParts[1]).ToWords();
+            }
+            else
+            {
+                numberToWords = Convert.ToInt64(number).ToWords();
             }
 
 
@@ -36,6 +42,22 @@ namespace dyscalculia_helper_lib
                 Words = numberToWords,
                 PhoneNumber = number.ToString("00 00 00 00")
             };
+        }
+
+        public static decimal AttemptParseNumber(string text, char decimalSeparator = ',')
+        {
+            var numberFormatInfo = new NumberFormatInfo
+            {
+                NumberDecimalSeparator = decimalSeparator.ToString()
+            };
+
+
+            if (decimal.TryParse(text, NumberStyles.Float, numberFormatInfo, out decimal parsedNumber))
+            {
+                return parsedNumber;
+            }
+
+            return decimal.MinValue; 
         }
     }
 }

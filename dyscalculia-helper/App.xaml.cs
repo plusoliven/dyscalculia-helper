@@ -7,6 +7,7 @@ using NHotkey;
 using NHotkey.Wpf;
 using dyscalculia_helper_lib;
 
+
 namespace dyscalculia_helper
 {
     /// <summary>
@@ -15,46 +16,69 @@ namespace dyscalculia_helper
     public partial class App : Application
     {
         private readonly MainWindow _window = new();
+        private readonly SettingsManager _settings = SettingsManager.Instance;
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            HotkeyManager.Current.AddOrReplace("ShowWindow", Key.D, ModifierKeys.Control, OnHotkeyPressed);
+            // Set up hotkey(s)
+            if (_settings.Hotkeys.Count > 0)
+            {
+                foreach (var hotkey in _settings.Hotkeys)
+                {
+                    HotkeyManager.Current.AddOrReplace("ShowWindow", hotkey.Key, hotkey.ModifierKey, OnHotkeyPressed);
+                }
+            }
         }
 
-        private void OnHotkeyPressed(object sender, HotkeyEventArgs e)
+        private void ShowWindowAndSetPositionToMouse()
         {
-            // Get selected number
-            // If none is selected, or the selected number is the same as the one before, hide the window
-            // Else, show the window with the updated number
-            var selectedText = Win32Helper.GetSelectedText();
-            Console.WriteLine("Selected text - " + selectedText);
+            _window.Show();
+            Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
+            _window.Left = mousePosition.X - (_window.Width / 2);
+            _window.Top = mousePosition.Y - (_window.Height - 20);
+            _window.Activate();
+        }
 
-            float? numberSelected = null;
-            if (float.TryParse(selectedText, out float parsedNumber))
+        private async void OnHotkeyPressed(object sender, HotkeyEventArgs e)
+        {
+            var selectedText = Win32Helper.GetSelectedText();
+            decimal numberSelected = decimal.MinValue;
+
+            if (selectedText != null) 
             {
-                numberSelected = parsedNumber;
+                // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
+                if (selectedText.Contains('.') || selectedText.Contains(','))
+                {
+                    ShowWindowAndSetPositionToMouse();
+                    char decimalSeparator = await _window.DetermineDecimalSeparator(selectedText);
+
+                    if (decimalSeparator == ',')
+                    {
+                        selectedText = selectedText.Replace(".", "");
+                    }
+                    else if (decimalSeparator == '.')
+                    {
+                        selectedText = selectedText.Replace(",", "");
+                    }
+
+                    numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText, decimalSeparator);
+                }
+                else
+                {
+                    numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText);
+                }
             }
 
-            Console.WriteLine("Parsed text as float - " + numberSelected);
-
-            if (numberSelected != null) 
+            if (numberSelected != decimal.MinValue)
             {
-                _window.Show();
-                var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected.Value);
-
+                var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected, _settings.DecimalSeparator);
+                Console.WriteLine(numberFormats);
                 _window.UpdateNumbersDisplay(numberFormats);
 
-                Win32Helper.GetCursorPos(out Win32Helper.POINT mousePosition);
-                _window.Left = mousePosition.X - (_window.Width / 2);
-                _window.Top = mousePosition.Y - (_window.Height - 20);
-
-                _window.Activate();
-
-               
+                ShowWindowAndSetPositionToMouse();
             }
-    
         }
 
     }
