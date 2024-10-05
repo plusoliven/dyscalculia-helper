@@ -49,6 +49,11 @@ namespace dyscalculia_helper
                     return;
                 }
 
+                if (selectedText.Length > Decimal.MaxValue.ToString().Length)
+                {
+                    return;
+                }
+
                 // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
                 if (selectedText.Contains('.') || selectedText.Contains(','))
                 {
