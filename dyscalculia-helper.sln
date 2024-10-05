@@ -5,7 +5,7 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dyscalculia-helper-front", "dyscalculia-helper\dyscalculia-helper-front.csproj", "{3EC39AAA-4AAB-453D-B33A-5CDECDA59CF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dyscalculia-helper-lib", "dyscalculia-helper-lib\dyscalculia-helper-lib.csproj", "{0384415A-B886-48DD-BD02-25DF875E63FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dyscalculia-helper-lib", "dyscalculia-helper-lib\dyscalculia-helper-lib.csproj", "{0384415A-B886-48DD-BD02-25DF875E63FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -35,55 +35,48 @@ namespace dyscalculia_helper
         private async void OnHotkeyPressed(object sender, HotkeyEventArgs e)
         {
             var selectedText = Win32Helper.GetSelectedText();
-            decimal numberSelected = decimal.MinValue;
+            decimal numberSelected;
 
-            if (selectedText != null) 
+            if (selectedText == null) 
+                return;
+
+            // Check if the selected text contains non-numeric characters, but still a full number
+            var regexMatch = new Regex(@"\d[0-9,\.]*\d").Match(selectedText);
+
+            if (regexMatch.Success) 
+                selectedText = regexMatch.Value;
+            else
+                return;
+
+            if (selectedText.Length > Decimal.MaxValue.ToString().Length)
+                return;
+
+            
+            // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
+            if (selectedText.Contains('.') || selectedText.Contains(','))
             {
-                // Check if the selected text contains non-numeric characters, but still a full number
-                var regexMatch = new Regex(@"\d[0-9,\.]*\d").Match(selectedText);
-                if (regexMatch.Success) {
-                    selectedText = regexMatch.Value;
-                }
-                else
-                {
-                    return;
-                }
-
-                if (selectedText.Length > Decimal.MaxValue.ToString().Length)
-                {
-                    return;
-                }
-
-                // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
-                if (selectedText.Contains('.') || selectedText.Contains(','))
-                {
-                    _window.ShowWindow();
-                    char decimalSeparator = await _window.DetermineDecimalSeparator(selectedText);
-
-                    if (decimalSeparator == ',')
-                    {
-                        selectedText = selectedText.Replace(".", "");
-                    }
-                    else if (decimalSeparator == '.')
-                    {
-                        selectedText = selectedText.Replace(",", "");
-                    }
-
-                    numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText, decimalSeparator);
-                }
-                else
-                {
-                    numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText);
-                }
-            }
-
-            if (numberSelected != decimal.MinValue)
-            {
-                var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected, _settings.DecimalSeparator);
-                _window.UpdateNumbersDisplay(numberFormats);
-
                 _window.ShowWindow();
+                char decimalSeparator = await _window.DetermineDecimalSeparator(selectedText);
+
+                selectedText = decimalSeparator == ','
+                    ? selectedText.Replace(".", "")
+                    : selectedText.Replace(",", "");
+
+
+                numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText, decimalSeparator);
             }
+            else
+                numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText);
+            
+
+            if (numberSelected == decimal.MinValue) 
+                return;
+            
+            var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected, _settings.DecimalSeparator);
+            _window.UpdateNumbersDisplay(numberFormats);
+
+            _window.ShowWindow();
+            
         }
 
     }

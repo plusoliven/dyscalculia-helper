@@ -53,9 +53,7 @@ namespace dyscalculia_helper_lib
 
 
             if (decimal.TryParse(text, NumberStyles.Float, numberFormatInfo, out decimal parsedNumber))
-            {
                 return parsedNumber;
-            }
 
             return decimal.MinValue; 
         }
