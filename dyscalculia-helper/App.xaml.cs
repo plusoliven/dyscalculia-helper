@@ -8,7 +8,6 @@ using NHotkey;
 using NHotkey.Wpf;
 using dyscalculia_helper_lib;
 
-
 namespace dyscalculia_helper
 {
     /// <summary>
@@ -18,6 +17,7 @@ namespace dyscalculia_helper
     {
         private readonly MainWindow _window = new();
         private readonly SettingsManager _settings = SettingsManager.Instance;
+        private string _lastSelectedText = "";
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -32,18 +32,17 @@ namespace dyscalculia_helper
             }
         }
 
-        private async void OnHotkeyPressed(object sender, HotkeyEventArgs e)
+        public void FetchSelectedText()
         {
             var selectedText = Win32Helper.GetSelectedText();
-            decimal numberSelected;
 
-            if (selectedText == null) 
+            if (selectedText == null)
                 return;
 
             // Check if the selected text contains non-numeric characters, but still a full number
             var regexMatch = new Regex(@"\d[0-9,\.]*\d").Match(selectedText);
 
-            if (regexMatch.Success) 
+            if (regexMatch.Success)
                 selectedText = regexMatch.Value;
             else
                 return;
@@ -51,34 +50,46 @@ namespace dyscalculia_helper
             if (selectedText.Length > Decimal.MaxValue.ToString().Length)
                 return;
 
-            
+            _lastSelectedText = selectedText;
+        }
+
+        public void UpdateMainWindow()
+        {
+            if (string.IsNullOrEmpty(_lastSelectedText))
+                return;
+
+            decimal numberSelected;
+
             // Check if the selected text contains any decimal / thousand separators, and if so, prompt the user to pick one
-            if (selectedText.Contains('.') || selectedText.Contains(','))
+            if (_lastSelectedText.Contains('.') || _lastSelectedText.Contains(','))
             {
                 _window.ShowWindow();
-                char decimalSeparator = await _window.DetermineDecimalSeparator(selectedText);
+                char decimalSeparator = _window.DecimalSeparator;
 
-                selectedText = decimalSeparator == ','
-                    ? selectedText.Replace(".", "")
-                    : selectedText.Replace(",", "");
+                _lastSelectedText = decimalSeparator == ','
+                    ? _lastSelectedText.Replace(".", "")
+                    : _lastSelectedText.Replace(",", "");
 
-
-                numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText, decimalSeparator);
+                numberSelected = ParseNumberToHuman.AttemptParseNumber(_lastSelectedText, decimalSeparator);
             }
             else
-                numberSelected = ParseNumberToHuman.AttemptParseNumber(selectedText);
-            
+            {
+                numberSelected = ParseNumberToHuman.AttemptParseNumber(_lastSelectedText);
+            }
 
-            if (numberSelected == decimal.MinValue) 
+            if (numberSelected == decimal.MinValue)
                 return;
-            
+
             var numberFormats = ParseNumberToHuman.ConvertNumberToFormats(numberSelected, _settings.DecimalSeparator);
             _window.UpdateNumbersDisplay(numberFormats);
 
             _window.ShowWindow();
-            
         }
 
+        private void OnHotkeyPressed(object sender, HotkeyEventArgs e)
+        {
+            FetchSelectedText();
+            UpdateMainWindow();
+        }
     }
-
 }

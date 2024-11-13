@@ -18,8 +18,10 @@ namespace dyscalculia_helper
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TaskCompletionSource<char> decimalSeparatorTcs;
-        private DoubleAnimation fadeInAnimation = new DoubleAnimation
+        public char DecimalSeparator { get; private set; }
+
+        private TaskCompletionSource<char> _decimalSeparatorTcs;
+        private readonly DoubleAnimation _fadeInAnimation = new DoubleAnimation
         {
             From = 0.0,
             To = 1.0,
@@ -29,6 +31,7 @@ namespace dyscalculia_helper
         public MainWindow()
         {
             InitializeComponent();
+            DecimalSeparator = ',';
         }
 
         private void Window_MouseLeave(object sender, MouseEventArgs e)
@@ -43,8 +46,8 @@ namespace dyscalculia_helper
 
             SelectDecimalCharSelectedText.Text = selectedText;
 
-            decimalSeparatorTcs = new TaskCompletionSource<char>();
-            char result = await decimalSeparatorTcs.Task;
+            _decimalSeparatorTcs = new TaskCompletionSource<char>();
+            char result = await _decimalSeparatorTcs.Task;
 
             SelectDecimalGrid.Visibility = Visibility.Collapsed;
 
@@ -64,21 +67,21 @@ namespace dyscalculia_helper
         private void FadeInWindow()
         {
             var storyboard = new Storyboard();
-            storyboard.Children.Add(fadeInAnimation);
-            Storyboard.SetTarget(fadeInAnimation, this);
-            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(OpacityProperty));
+            storyboard.Children.Add(_fadeInAnimation);
+            Storyboard.SetTarget(_fadeInAnimation, this);
+            Storyboard.SetTargetProperty(_fadeInAnimation, new PropertyPath(OpacityProperty));
 
             this.BeginStoryboard(storyboard);
         }
 
         private void CommaButton_Click(object sender, RoutedEventArgs e)
         {
-            decimalSeparatorTcs?.SetResult(',');
+            _decimalSeparatorTcs?.SetResult(',');
         }
 
         private void PeriodButton_Click(object sender, RoutedEventArgs e)
         {
-            decimalSeparatorTcs?.SetResult('.');
+            _decimalSeparatorTcs?.SetResult('.');
         }
 
         public void UpdateNumbersDisplay(ParseNumberToHuman.NUMBERFORMATS formats)
@@ -90,6 +93,24 @@ namespace dyscalculia_helper
             ThousandsSeparatedDisplay.Text = formats.ThousandsSeparated;
             NumberWordsDisplay.Text = formats.Words;
             // PhoneNumberDisplay.Text = formats.PhoneNumber;
+        }
+
+        private void RadioDecimalSeparatorComma_Checked(object sender, RoutedEventArgs e)
+        {
+            DecimalSeparator = ',';
+            RadioDecimalSeparatorComma.IsChecked = true;
+            RadioDecimalSeparatorPeriod.IsChecked = false;
+            var app = (App)Application.Current;
+            app.UpdateMainWindow();
+        }
+
+        private void RadioDecimalSeparatorPeriod_Checked(object sender, RoutedEventArgs e)
+        {
+            DecimalSeparator = '.';
+            RadioDecimalSeparatorComma.IsChecked = false;
+            RadioDecimalSeparatorPeriod.IsChecked = true;
+            var app = (App)Application.Current;
+            app.UpdateMainWindow();
         }
     }
 }
